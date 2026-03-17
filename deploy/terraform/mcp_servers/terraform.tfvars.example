@@ -1,0 +1,37 @@
+# IBM Cloud credentials
+ibmcloud_api_key     = "xxxxxxxxxxxxx"
+region               = "us-south"
+
+# Code Engine project (auto-derived from resource group if left empty)
+ce_project_name      = "your-ce-project-name"
+
+# Container Registry
+# Format: <region_prefix>.icr.io/<namespace>/<image>:0.0.0
+cr_registry_server   = "us.icr.io"
+cr_namespace         = "<your-cr-namespace>"
+
+# Shared MCP image name (must match what was pushed with make push)
+image_name           = "mcp-server"
+
+# MCP transport (sse | streamable-http | mcp)
+mcp_transport        = "mcp"
+
+# MCP Server 1 – Underwriting (port 8007)
+mcp_server1_name   = "underwriting-mcp-server"
+mcp_server1_port   = 8007
+mcp_server1_script = "underwriting_mcp_server.py"
+
+# MCP Server 2 – CRM (port 8010)
+mcp_server2_name   = "crm-mcp-server"
+mcp_server2_port   = 8010
+mcp_server2_script = "crm_mcp_server.py"
+
+# MCP Server 3 – Health (port 8009)
+mcp_server3_name   = "health-mcp-server"
+mcp_server3_port   = 8009
+mcp_server3_script = "health_mcp_server.py"
+
+# Watsonx.ai (required by underwriting server only)
+ibm_cloud_url        = "https://us-south.ml.cloud.ibm.com"
+watson_ai_project_id = "xxxxxxxxxxxxx"
+watson_ai_api_key    = "xxxxxxxxxxxxxxxxxx"

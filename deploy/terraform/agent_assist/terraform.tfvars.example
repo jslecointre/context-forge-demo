@@ -1,0 +1,71 @@
+# IBM Cloud credentials
+ibmcloud_api_key = "xxxxxxxxxxxxx"
+region           = "us-south"
+
+# Code Engine project (auto-derived from resource group if left empty)
+ce_project_name  = "your-ce-project-name"
+
+# Container Registry
+# Format: <region_prefix>.icr.io/<namespace>/<image>:latest
+cr_registry_server = "us.icr.io"
+cr_namespace       = "<your-cr-namespace>"
+image_name         = "agent-assist-app"
+
+# Agent-Assist app
+app_name = "agent-assist-app"
+app_port = 8002
+
+# Backend – public URL injected into the frontend so the browser can reach the API.
+# Set to the Code Engine endpoint after first deploy (leave empty on first run).
+# Example: https://agent-assist-app.xxxxx.us-south.codeengine.appdomain.cloud
+backend_url      = ""
+backend_auth     = "false"
+backend_user     = "user"
+backend_password = "xxxxxxxxxxxxx"
+
+# Watsonx.ai
+watsonx_apikey     = "xxxxxxxxxxxxx"
+watsonx_url        = "https://us-south.ml.cloud.ibm.com"
+watsonx_project_id = "xxxxxxxxxxxxx"
+
+# OpenAI
+openai_api_key = "xxxxxxxxxxxxx"
+
+# Model
+model = "ibm:openai/gpt-oss-120b"
+
+# LangSmith (optional – leave empty to disable tracing)
+langsmith_api_key = "xxxxxxxxxxxxx"
+langsmith_tracing = "false"
+langsmith_project = "xxxxxxxxxxxxx"
+
+# Langfuse (optional – leave empty to disable tracing)
+langfuse_base_url   = "https://cloud.langfuse.com"
+langfuse_secret_key = "xxxxxxxxxxxxx"
+langfuse_public_key = "xxxxxxxxxxxxx"
+
+# MCP Server Hosts – set to IBM Code Engine public endpoints output by terraform/mcp_servers
+# Example: https://underwriting-mcp-server.xxxxx.us-south.codeengine.appdomain.cloud
+mcp_host1 = "https://underwriting-mcp-server.xxxxx.us-south.codeengine.appdomain.cloud"
+mcp_host2 = "https://crm-mcp-server.xxxxx.us-south.codeengine.appdomain.cloud"
+mcp_host3 = "https://health-mcp-server.xxxxx.us-south.codeengine.appdomain.cloud"
+
+# MCP Server Ports (default values match docker-compose)
+mcp_port1 = 8007
+mcp_port2 = 8008
+mcp_port3 = 8009
+
+# MCP Transport (sse | streamable-http | mcp)
+mcp_transport1 = "mcp"
+mcp_transport2 = "mcp"
+mcp_transport3 = "mcp"
+
+# Context Forge
+context_forge_base_url          = "https://mcp-context-forge.xxxxx.us-south.codeengine.appdomain.cloud"
+context_forge_mcp_transport     = "mcp"
+context_forge_admin_username    = "admin"
+context_forge_admin_password    = "xxxxxxxxxxxxx"
+broker_context_forge_token      = "xxxxxxxxxxxxx"
+analyst_context_forge_token     = "xxxxxxxxxxxxx"
+broker_context_forge_vserver    = "broker-vserver"
+analyst_context_forge_vserver   = "analyst-vserver"

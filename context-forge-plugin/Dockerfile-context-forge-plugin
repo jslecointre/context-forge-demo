@@ -1,0 +1,6 @@
+FROM ghcr.io/ibm/mcp-context-forge:latest
+
+WORKDIR /app
+# update the docker file by adding event_generator
+COPY pii_filter_demo ./plugins/pii_filter_demo
+COPY config_demo.yaml ./plugins/config_demo.yaml

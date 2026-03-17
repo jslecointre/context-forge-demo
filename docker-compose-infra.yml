@@ -1,0 +1,58 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    profiles:
+      - mcp
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - mcp-servers
+  mcp-context-forge-plugin:
+    container_name: mcp-context-forge-plugin
+    build:
+      context: ./context-forge-plugin
+      dockerfile: Dockerfile-context-forge-plugin
+    image: mcp-context-forge-plugin
+    profiles:
+      - mcp
+    ports:
+      - "${CONTEXT_FORGE_PORT:-4444}:4444"
+    env_file:
+      - .env.contextforge
+    environment:
+      # Override Redis URL to use the internal Docker network hostname
+      # (overrides any value from .env.contextforge)
+      REDIS_URL: redis://redis:6379
+#    volumes:
+#      - mcp_tools:/app/tools
+    healthcheck:
+      # Use wget instead of curl (Alpine-based image)
+      # Note: Health check uses internal PORT env var set above
+      test: ["CMD-SHELL", "curl -sf http://localhost:4444/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - mcp-servers
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  mcp-servers:
+    driver: bridge

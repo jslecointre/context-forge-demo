@@ -1,0 +1,99 @@
+# IBM Cloud credentials
+ibmcloud_api_key = "xxxxxxxxxxxxx"
+region           = "us-south"
+
+# Code Engine project (auto-derived from resource group if left empty)
+ce_project_name = "your-ce-project-name"
+
+# Container Registry
+# Image is built from ./context-forge-plugin/Dockerfile-context-forge-plugin
+# and pushed to: <cr_registry_server>/<cr_namespace>/<image_name>:0.0.0
+cr_registry_server = "us.icr.io"
+cr_namespace       = "<your-cr-namespace>"
+image_name         = "mcp-context-forge-plugin"
+
+# App names (match docker-compose-infra.yml service names)
+app_name       = "mcp-context-forge-plugin"
+app_port       = 4444
+redis_app_name = "redis"
+
+# Redis URL – leave empty to use the internal Code Engine Redis app.
+# For production, set to an IBM Databases for Redis URL:
+#   redis_url = "redis://<user>:<password>@<host>:<port>/0"
+redis_url = ""
+
+# Authentication
+basic_auth_user        = "admin"
+basic_auth_password    = "changeme"
+jwt_secret_key         = "my-test-key"
+auth_encryption_secret = "my-test-salt"
+
+# Platform Admin
+platform_admin_email    = "admin@example.com"
+platform_admin_password = "changeme"
+default_user_password   = "changeme"
+
+# Token Settings
+require_jti                 = "true"
+require_token_expiration    = "true"
+public_registration_enabled = "false"
+allow_public_visibility     = "true"
+
+# Network
+host = "0.0.0.0"
+# Use http://localhost for the first deploy, then update to the Code Engine endpoint, e.g.:
+#   app_domain = "https://mcp-context-forge-plugin.xxxxx.us-south.codeengine.appdomain.cloud"
+app_domain = "http://localhost"
+
+# Gateway Features
+mcpgateway_ui_enabled            = "true"
+mcpgateway_admin_api_enabled     = "true"
+mcpgateway_ws_relay_enabled      = "false"
+mcpgateway_reverse_proxy_enabled = "false"
+
+# SSRF Protection
+ssrf_allow_localhost        = "true"
+ssrf_allow_private_networks = "true"
+ssrf_dns_fail_closed        = "false"
+
+# Security
+# Set secure_cookies = "true" when serving over HTTPS (recommended for Code Engine)
+secure_cookies = "false"
+
+dangerous_patterns = [
+  "[;&|`$(){}\\[\\]<>]",
+  "\\.\\.[\\\\/]",
+  "[\\x00-\\x1f\\x7f-\\x9f]",
+  "(?i)(drop|delete|insert|update|select)\\s+(table|from|into|where)"
+]
+
+# Validation / Audit
+experimental_validate_io      = "false"
+validation_middleware_enabled = "false"
+permission_audit_enabled      = "false"
+
+# Password Policy
+password_require_uppercase = "false"
+password_require_lowercase = "false"
+password_require_special   = "false"
+
+# Timeouts / Intervals
+mcpgateway_ui_tool_test_timeout = 120000
+health_check_interval           = 300
+global_config_cache_ttl         = 300
+
+# Logging
+log_file   = "mcpgateway.log"
+log_folder = "logs"
+
+# OpenTelemetry (optional – leave empty to disable)
+otel_exporter_otlp_endpoint = ""
+
+# MCP Client
+mcp_client_auth_enabled = "true"
+
+# Plugins
+plugins_enabled         = "true"
+plugins_config_file     = "plugins/config_demo.yaml"
+plugins_log_level       = "INFO"
+plugins_cli_markup_mode = "rich"

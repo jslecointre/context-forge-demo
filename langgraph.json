@@ -1,0 +1,10 @@
+{
+    "dockerfile_lines": [],
+    "graphs": {
+      "agent_assist_agentic_workflow": "./backend/agents/run_workflow.py:agent_assist_agentic_workflow",
+      "agent_assist_mcp_agentic_workflow": "./backend/agents/run_workflow.py:agent_assist_mcp_agentic_workflow"
+    },
+    "python_version": "3.12",
+    "env": ".env",
+    "dependencies": ["."]
+  }

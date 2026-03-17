@@ -1,0 +1,144 @@
+include:
+  - path:
+      - docker-compose-infra.yml
+
+name: ${PROJECT_NAME:-context-forge-demo}
+
+services:
+  agent-assist:
+    build:
+      context: .
+      dockerfile: Dockerfile-agent-assist
+      args:
+        REGISTRY: ${REPOSITORY}
+        VERSION: ${PROJECT_VERSION:-0.0.1}
+    image: ${REPOSITORY}/agent-assist-app:${PROJECT_VERSION:-0.0.1}
+    ports:
+      - "8002:8002"
+    networks:
+      - mcp-servers
+    environment:
+      - WATSONX_APIKEY=${WATSONX_APIKEY}
+      - WATSONX_URL=${WATSONX_URL}
+      - WATSONX_PROJECT_ID=${WATSONX_PROJECT_ID}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MODEL=${MODEL}
+      - LANGFUSE_BASE_URL=${LANGFUSE_BASE_URL}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY}
+      - MCP_HOST1=http://underwriting_mcp_server
+      - MCP_HOST2=http://crm_mcp_server
+      - MCP_HOST3=http://health_mcp_server
+      - MCP_TRANSPORT1=${MCP_TRANSPORT1}
+      - MCP_TRANSPORT2=${MCP_TRANSPORT2}
+      - MCP_TRANSPORT3=${MCP_TRANSPORT3}
+      - MCP_PORT1=${MCP_PORT1}
+      - MCP_PORT2=${MCP_PORT2}
+      - MCP_PORT3=${MCP_PORT3}
+      - CONTEXT_FORGE_ADMIN_USERNAME=${CONTEXT_FORGE_ADMIN_USERNAME}
+      - CONTEXT_FORGE_ADMIN_PASSWORD=${CONTEXT_FORGE_ADMIN_PASSWORD}
+      - BROKER_CONTEXT_FORGE_TOKEN=${BROKER_CONTEXT_FORGE_TOKEN}
+      - ANALYST_CONTEXT_FORGE_TOKEN=${ANALYST_CONTEXT_FORGE_TOKEN}
+      - BROKER_CONTEXT_FORGE_VSERVER=${BROKER_CONTEXT_FORGE_VSERVER}
+      - ANALYST_CONTEXT_FORGE_VSERVER=${ANALYST_CONTEXT_FORGE_VSERVER}
+      - CONTEXT_FORGE_BASE_URL=http://mcp-context-forge-plugin:4444
+      - CONTEXT_FORGE_MCP_TRANSPORT=${CONTEXT_FORGE_MCP_TRANSPORT}
+      - BACKEND_AUTH=${BACKEND_AUTH}
+      - BACKEND_USER=${BACKEND_USER}
+      - BACKEND_PASSWORD=${BACKEND_PASSWORD}
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8002/')\""]
+      interval: 30s
+      timeout: 10s
+      start_period: 15s
+      retries: 3
+  underwriting_mcp_server:
+    build:
+      context:  .
+      dockerfile: ./mcp_servers/Dockerfile-mcp
+      args:
+        PORT: 8007
+    image: ${REPOSITORY}/mcp-server:${PROJECT_VERSION:-0.0.1}
+    ports:
+      - "8007:8007"
+    networks:
+      - mcp-servers
+    command: ["uv", "run", "underwriting_mcp_server.py"]
+    environment:
+      - MCP_TRANSPORT=${MCP_TRANSPORT1:-mcp}
+      - MCP_PORT=8007
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - WATSONX_APIKEY=${WATSONX_APIKEY}
+      - WATSONX_URL=${WATSONX_URL}
+      - WATSONX_PROJECT_ID=${WATSONX_PROJECT_ID}
+  crm_mcp_server:
+    build:
+      context:  .
+      dockerfile: ./mcp_servers/Dockerfile-mcp
+      args:
+        PORT: 8008
+    image: ${REPOSITORY}/mcp-server:${PROJECT_VERSION:-0.0.1}
+    ports:
+      - "8008:8008"
+    networks:
+      - mcp-servers
+    command: ["uv", "run", "crm_mcp_server.py"]
+    environment:
+      - MCP_TRANSPORT=${MCP_TRANSPORT2:-mcp}
+      - MCP_PORT=8008
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+  health_mcp_server:
+    build:
+      context: .
+      dockerfile: ./mcp_servers/Dockerfile-mcp
+      args:
+        PORT: 8009
+    image: ${REPOSITORY}/mcp-server:${PROJECT_VERSION:-0.0.1}
+    ports:
+      - "8009:8009"
+    networks:
+      - mcp-servers
+    command: ["uv", "run", "health_mcp_server.py"]
+    environment:
+      - MCP_TRANSPORT=${MCP_TRANSPORT3:-mcp}
+      - MCP_PORT=8009
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+
+  setup-context-forge:
+    extends:
+      service: agent-assist
+    entrypoint: ["python", "/app/backend/setup_context_forge.py"]
+    ports: []
+    profiles:
+      - mcp
+    networks:
+      - mcp-servers
+    depends_on:
+      mcp-context-forge-plugin:
+        condition: service_healthy
+      underwriting_mcp_server:
+        condition: service_started
+      crm_mcp_server:
+        condition: service_started
+      health_mcp_server:
+        condition: service_started
+    environment:
+      - MCP_HOST1=http://underwriting_mcp_server
+      - MCP_HOST2=http://crm_mcp_server
+      - MCP_HOST3=http://health_mcp_server
+      - MCP_TRANSPORT1=${MCP_TRANSPORT1}
+      - MCP_TRANSPORT2=${MCP_TRANSPORT2}
+      - MCP_TRANSPORT3=${MCP_TRANSPORT3}
+      - MCP_PORT1=${MCP_PORT1}
+      - MCP_PORT2=${MCP_PORT2}
+      - MCP_PORT3=${MCP_PORT3}
+
+volumes:
+  logs:
+    driver: local
+
+networks:
+  mcp-servers:
+    driver: bridge

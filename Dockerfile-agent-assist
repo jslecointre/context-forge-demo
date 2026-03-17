@@ -1,0 +1,21 @@
+ARG REGISTRY
+ARG VERSION
+FROM ${REGISTRY}/agent-assist-app-base:${VERSION}
+
+WORKDIR /app
+
+# Copy application source code
+# pyproject.toml and uv.lock are already present from the base image
+COPY backend ./backend
+COPY frontend ./frontend
+COPY store ./store
+COPY main.py ./
+
+# Install the project package itself into the uv-managed environment
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen
+
+ENV PYTHONPATH=/app:$PYTHONPATH
+EXPOSE 8002
+
+CMD ["uv", "run", "uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8002"]
